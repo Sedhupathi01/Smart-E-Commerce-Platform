@@ -37,9 +37,12 @@ async def create_order(
         product.stock -= item.quantity
 
     # Create Stripe Payment Intent (Mocked for local dev)
+    intent_id = None
+    client_secret = None
     try:
         if stripe.api_key == "sk_test_mock":
             intent_id = "pi_mock_12345"
+            client_secret = "src_mock_secret"
         else:
             intent = stripe.PaymentIntent.create(
                 amount=int(total_amount * 100), # Amount in cents
@@ -47,6 +50,7 @@ async def create_order(
                 metadata={"user_id": current_user.id}
             )
             intent_id = intent.id
+            client_secret = intent.client_secret
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Stripe Error: {str(e)}")
 
@@ -56,6 +60,7 @@ async def create_order(
         order_status="processing",
         payment_status="pending",
         stripe_payment_intent_id=intent_id,
+        client_secret=client_secret,
         address=order_data.address,
         created_at=datetime.utcnow()
     )

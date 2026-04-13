@@ -60,6 +60,7 @@ class Order(Base):
     order_status = Column(String(20), default="processing")
     payment_status = Column(String(20), default="pending")
     stripe_payment_intent_id = Column(String(255), nullable=True)
+    client_secret = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     address = Column(Text)
     

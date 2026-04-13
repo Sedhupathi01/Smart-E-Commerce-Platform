@@ -61,6 +61,7 @@ class OrderSchema(BaseModel):
     payment_status: str
     created_at: datetime
     address: str
+    client_secret: Optional[str] = None
     
     class Config:
         from_attributes = True
