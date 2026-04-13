@@ -1,0 +1,13 @@
+{
+  "name": "smart-ecommerce-root",
+  "version": "1.0.0",
+  "description": "Root management for Smart E-Commerce Platform",
+  "scripts": {
+    "frontend": "cd frontend && npm run dev",
+    "backend-api": "cd backend-api && uvicorn app.main:app --reload",
+    "backend-admin": "cd backend-admin && python3 manage.py runserver 8001",
+    "infra": "docker compose up -d",
+    "seed": "python3 scripts/seed_data.py",
+    "dev": "npm run frontend"
+  }
+}

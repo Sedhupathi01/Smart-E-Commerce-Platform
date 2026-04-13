@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+.next/
+dist/
+build/
+*.log
+*.pyc
+__pycache__/
+.env
+.DS_Store
+
+# Databases
+*.db
+*.sqlite3
+
+# Service Logs
+fastapi.log
+django.log
+frontend.log
+backend-api-final.log
+backend-admin-final.log
+backend-final.log
+
+# Artifacts
+.gemini/
+.agents/
