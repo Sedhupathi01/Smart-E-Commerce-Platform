@@ -36,21 +36,38 @@ async def create_order(
         # Deduct stock
         product.stock -= item.quantity
 
-    # Create Stripe Payment Intent (Mocked for local dev)
+    # Create Stripe Checkout Session
     intent_id = None
-    client_secret = None
+    checkout_url = None
     try:
         if stripe.api_key == "sk_test_mock":
             intent_id = "pi_mock_12345"
-            client_secret = "src_mock_secret"
+            checkout_url = "https://checkout.stripe.com/pay/mock_session"
         else:
-            intent = stripe.PaymentIntent.create(
-                amount=int(total_amount * 100), # Amount in cents
-                currency="usd",
+            line_items = []
+            for item in order_data.items:
+                product = db.query(Product).filter(Product.id == item.product_id).first()
+                line_items.append({
+                    'price_data': {
+                        'currency': 'usd',
+                        'product_data': {
+                            'name': product.name,
+                        },
+                        'unit_amount': int(product.price * 100),
+                    },
+                    'quantity': item.quantity,
+                })
+
+            session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=line_items,
+                mode='payment',
+                success_url="http://localhost:3000/orders?success=true",
+                cancel_url="http://localhost:3000/checkout?canceled=true",
                 metadata={"user_id": current_user.id}
             )
-            intent_id = intent.id
-            client_secret = intent.client_secret
+            intent_id = session.id
+            checkout_url = session.url
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Stripe Error: {str(e)}")
 
@@ -60,7 +77,6 @@ async def create_order(
         order_status="processing",
         payment_status="pending",
         stripe_payment_intent_id=intent_id,
-        client_secret=client_secret,
         address=order_data.address,
         created_at=datetime.utcnow()
     )
@@ -68,6 +84,9 @@ async def create_order(
     db.add(new_order)
     db.commit()
     db.refresh(new_order)
+
+    # Attach dynamic URL for response
+    new_order.checkout_url = checkout_url
 
     # Link items to order
     for item in items_to_create:

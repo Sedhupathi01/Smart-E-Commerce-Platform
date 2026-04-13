@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status, WebSocket, WebSocke
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Dict
-from .api.v1 import products, auth, orders, cart, admin, notifications
+from .api.v1 import products, auth, orders, cart, admin, notifications, payments
 from .db.db import get_db
 
 app = FastAPI(title="Smart E-Commerce API", version="1.0.0")
@@ -50,6 +50,7 @@ app.include_router(cart.router, prefix="/api/v1/cart", tags=["Cart"])
 app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
 app.include_router(notifications.router, prefix="/api/v1/notifications", tags=["Notifications"])
+app.include_router(payments.router, prefix="/api/v1/payments", tags=["Payments"])
 
 @app.get("/")
 def root():

@@ -103,3 +103,17 @@ class Notification(Base):
     created_at = Column(DateTime(timezone=True), default=func.now())
     
     user = relationship("User")
+
+class Payment(Base):
+    __tablename__ = "core_payment"
+    id = Column(Integer, primary_key=True, index=True)
+    order_id = Column(Integer, ForeignKey("core_order.id"), nullable=True)
+    user_id = Column(Integer, ForeignKey("core_user.id"))
+    amount = Column(Numeric(10, 2))
+    payment_method = Column(String(50), default="Stripe")
+    transaction_id = Column(String(255), unique=True, index=True)
+    status = Column(String(20), default="pending")
+    created_at = Column(DateTime(timezone=True), default=func.now())
+    
+    order = relationship("Order")
+    user = relationship("User")
